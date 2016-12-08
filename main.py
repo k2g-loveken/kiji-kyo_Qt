@@ -1,4 +1,5 @@
 # -*- coding: utf-8 -*-
+"""会員名簿管理システム"""
 import sys
 import os
 import sqlite3
@@ -6,7 +7,7 @@ from ui_convert import UiConvert
 from PyQt5 import QtWidgets, QtSvg
 from jinja2 import Environment, FileSystemLoader
 from PyQt5.QtPrintSupport import QPrinter
-from PyQt5.QtCore import QUrl, QByteArray
+from PyQt5.QtCore import QUrl
 from PyQt5.QtWebKitWidgets import QWebView
 from subprocess import check_call
 
@@ -18,7 +19,9 @@ cmb_data = [['', '東', '西'],
             ['', '1', '2', '3', '4'],
             ['', '1', '2', '3', '4', '5', '6', '7']]
 
+
 class Form(QtWidgets.QWidget):
+    """メインウィンドウ(Qt)"""
     def __init__(self):
         super(Form, self).__init__()
 
@@ -53,10 +56,11 @@ class Form(QtWidgets.QWidget):
         self.ui.cmb_han.addItems(cmb_data[2])
 
     def __del__(self):
-        # ウィンドウを閉じる時DBをclose
+        """ウィンドウを閉じる時DBをclose"""
         self.con.db_close()
 
     def list_click(self, row):
+        """リストクリック時、行からデータを取得しサブウィンドウを開く"""
         # 親ウィンドウよりNo取得
         item = self.ui.tbl_main.item(row, 0)
         # Noをキーにレコードを取得
@@ -67,6 +71,7 @@ class Form(QtWidgets.QWidget):
         self.sub.show()
 
     def list_search(self):
+        """検索ボタン押下時フォーム内入力を基にDBを検索、リストに表示する"""
         self.ui.tbl_main.clearContents()
         self.ui.tbl_main.setRowCount(0)
         jitikai = self.ui.cmb_jitikai.currentText()
@@ -86,6 +91,7 @@ class Form(QtWidgets.QWidget):
             j += 1
 
     def list_print(self):
+        """印刷ボタン押下時、リストよりjinja2テンプレート用データを生成しPDF生成オブジェクトに渡す"""
         # テンプレートへ挿入するデータの作成
         data = []
         for i in range(self.ui.tbl_main.rowCount()):
@@ -96,10 +102,12 @@ class Form(QtWidgets.QWidget):
                          'name': str(self.ui.tbl_main.item(i, 6).text()),
                          })
 
+        # PDF生成用オブジェクトの生成
         pdf = MakePdf()
         pdf.make(data)
 
     def jitikai_change(self):
+        """自治会コンボボックスの変更時、対応する値を組コンボボックスにセットする"""
         self.ui.cmb_kumi.clear()
         text = self.ui.cmb_jitikai.currentText()
         self.ui.cmb_kumi.addItem("")
@@ -108,6 +116,7 @@ class Form(QtWidgets.QWidget):
             self.ui.cmb_kumi.addItem(str(row[0]))
 
     def kumi_change(self):
+        """組コンボボックスの変更時、対応する値を班コンボボックスにセットする"""
         self.ui.cmb_han.clear()
         text = self.ui.cmb_kumi.currentText()
         self.ui.cmb_han.addItem("")
@@ -117,6 +126,7 @@ class Form(QtWidgets.QWidget):
 
 
 class Dialog(QtWidgets.QDialog):
+    """詳細データ表示用サブウィンドウ"""
     def __init__(self):
         super(Dialog, self).__init__()
         # ---- 初期処理 -----
@@ -124,10 +134,12 @@ class Dialog(QtWidgets.QDialog):
         self.ui.setupUi(self)
 
     def map_show(self):
+        """地図(SVG)を表示"""
         svg.load('map.svg')
         svg.show()
 
     def input_data(self, row):
+        """親ウィンドウから渡されたデータをセット"""
         self.ui.lbl_no.setText(row[0])
         self.ui.txt_jitikai.setText(row[2])
         self.ui.txt_kumi.setText(row[3])
@@ -137,11 +149,13 @@ class Dialog(QtWidgets.QDialog):
 
 
 class DbConnect:
+    """データベース操作"""
     def __init__(self, str_db):
         con = sqlite3.connect(str_db)
         self.cur = con.cursor()
 
     def get_header(self):
+        """DBより項目名を取得し、リストのヘッダーにセット"""
         self.cur.execute("select * from '会員名簿'")
         header = []
         for colinfo in self.cur.description:
@@ -149,6 +163,7 @@ class DbConnect:
         return header
 
     def get_record(self, no):
+        """サブウィンドウへ送る為のデータを取得"""
         sql = (
             "SELECT * FROM 会員名簿 "
             "WHERE No = :ID"
@@ -157,6 +172,7 @@ class DbConnect:
         return result
 
     def get_data(self, jitikai, kumi, han, name, address, delflg):
+        """フォームの入力値からリスト用データを取得"""
         sql = (
             "SELECT * FROM 会員名簿 "
             "WHERE 自治会 LIKE :jitikai "
@@ -179,6 +195,7 @@ class DbConnect:
         return result
 
     def get_cmb_kumi(self, jitikai):
+        """組コンボボックス用データの取得"""
         sql = (
             "SELECT DISTINCT 組 FROM 会員名簿 "
             "WHERE 自治会 = :jitikai "
@@ -187,6 +204,7 @@ class DbConnect:
         return result
 
     def get_cmb_han(self, kumi):
+        """班コンボボックス用データの取得"""
         sql = (
             "SELECT DISTINCT 班 FROM 会員名簿 "
             "WHERE 組 = :kumi "
@@ -226,6 +244,7 @@ class PrinterView:
 
 
 class MakePdf:
+    """PDF作成ベースのHTMLをテンプレートより作成する"""
     def __init__(self):
         # テンプレートファイルを指定
         self.env = Environment(loader=FileSystemLoader('./', encoding='utf8'))
@@ -241,32 +260,12 @@ class MakePdf:
 
 
 class SvgMap:
+    """SVGファイルの読み込み・表示"""
     def __init__(self, file):
         self.svg = QtSvg.QSvgWidget(self, file)
 
     def map_show(self):
         self.svg.show()
-
-    '''
-    def __init__(self, in_file):
-        in_path = os.path.abspath(os.path.dirname(sys.argv[0]))
-        self.file = os.path.join(in_path, in_file)
-        data = open(self.file).read()
-        self.svg = QtSvg.QSvgRenderer(QByteArray(data))
-        self.web = QWebView()
-        self.web.setRenderHint(QPainter.SmoothPixmapTransform)
-        self.web.setRenderHint(QPainter.Antialiasing)
-        self.web.setRenderHint(QPainter.TextAntialiasing)
-        self.painter = QPainter()
-
-    def show(self):
-        self.web.load(self.file)
-        self.web.loadFinished.connect(self.load_finished)
-
-    def load_finished(self):
-        self.web.resize(1024, 768)
-        self.svg.render(self.painter)
-    '''
 
 if __name__ == '__main__':
     # ----- debug ------
