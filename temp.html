@@ -1,0 +1,126 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"
+        "http://www.w3.org/TR/html4/loose.dtd">
+<html>
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+    <title>template</title>
+    <style type="text/css">
+        body{
+            font-family: "ＭＳ 明朝";
+            font-size: 5mm;
+        }
+        div.header{
+            align: center;
+            position: relative;
+            height: 300mm;
+            page-break-before: avid;
+            }
+        div.master{
+            align: center;
+            position: relative;
+            height: 300mm;
+            page-break-before: always;
+            }
+        div.table1{
+            width:80mm;
+            position: absolute;
+            top: 10mm;
+            left: 5mm;
+            }
+        div.table2{
+            width:80mm;
+            position: absolute;
+            top: 10mm;
+            left: 90mm;
+            }
+        div.table3{
+            width:80mm;
+            position: absolute;
+            top: 10mm;
+            left: 175mm;
+            }
+        table{
+            border-collapse: collapse;
+            border: solid 2px;
+        }
+        td{
+            border:solid 1px;
+            padding: 1mm;
+        }
+        td.chk{
+            text-align: center;
+            width: 7mm;
+        }
+        td.no{
+            font-size: 4mm;
+            text-align: center;
+            width: 10mm;
+        }
+        td.kbn{
+            text-align: center;
+            width: 6mm;
+        }
+        td.kumi{
+            text-align: center;
+            width: 6mm;
+        }
+        td.han{
+            text-align: center;
+            width: 6mm;
+        }
+        td.name{
+            width: 45mm;
+        }
+    </style>
+</head>
+<body>
+<!--for {% for data in data_list %} -->
+<!--ifC {% if (loop.index0 / 50) % 3 == 0 %} -->
+<!--ifG {% if loop.index0 > 1 %} -->
+</table>
+</div>
+</div>
+<!--endifG {% endif %} -->
+<!--ifH {% if loop.index0 == 0 %} -->
+<div class = "header">
+<!--elseH {% else %} -->
+<div class = "master">
+<!--endifH {% endif %} -->
+    <div class = "table1">
+<!--endifC {% endif %} -->
+<!--ifD {% if (loop.index0 / 50) % 3 == 1 %} -->
+    </table>
+    </div>
+    <div class = "table2">
+<!--endifD {% endif %} -->
+<!--ifE {% if (loop.index0 / 50) % 3 == 2 %} -->
+    </table>
+    </div>
+    <div class = "table3">
+<!--endifE {% endif %} -->
+<!--ifA {% if loop.index0 % 50 == 0 %} -->
+        <table>
+            <tr>
+                <td class="chk"></td>
+                <td class="no">No</td>
+                <td class="kbn"></td>
+                <td class="kumi">組</td>
+                <td class="han">班</td>
+                <td class="name">氏名</tdcla>
+            </tr>
+<!--endifA {% endif %} -->
+            <tr>
+                <td class="chk"></td>
+                <td class="no">{{data.no}}</td>
+                <td class="kbn">{{data.kbn}}</td>
+                <td class="kumi">{{data.kumi}}</tdc>
+                <td class="han">{{data.han}}</td>
+                <td class="name">{{data.name}}</td>
+            </tr>
+<!--endfor {% endfor %} -->
+        </table>
+    </div>
+</div>
+
+</body>
+</html>
