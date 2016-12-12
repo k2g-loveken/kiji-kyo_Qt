@@ -213,10 +213,12 @@ class DbConnect:
         return result
 
     def db_close(self):
+        """DBを閉じる"""
         self.cur.close()
 
 
 class PrinterView:
+    """HTMLからPDFを生成する(グローバルにて定義が必要)"""
     def __init__(self, in_file, out_file):
         in_path = os.path.abspath(os.path.dirname(sys.argv[0]))
         self.loadcnt = 0
@@ -232,11 +234,13 @@ class PrinterView:
         self.view.setZoomFactor(1)
 
     def load(self):
+        """変換処理"""
         self.view.load(QUrl.fromLocalFile(self.in_file))
         self.loadcnt = 0
         self.view.loadFinished.connect(self.load_fin)
 
     def load_fin(self):
+        """変換処理2"""
         if self.loadcnt == 0:
             self.view.print_(self.printer)
             check_call('list.pdf', shell=True)
