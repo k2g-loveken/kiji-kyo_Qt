@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>800</width>
-    <height>600</height>
+    <width>1024</width>
+    <height>768</height>
    </rect>
   </property>
   <property name="sizePolicy">
@@ -18,14 +18,14 @@
   </property>
   <property name="minimumSize">
    <size>
-    <width>800</width>
-    <height>600</height>
+    <width>1024</width>
+    <height>768</height>
    </size>
   </property>
   <property name="maximumSize">
    <size>
-    <width>800</width>
-    <height>600</height>
+    <width>1024</width>
+    <height>768</height>
    </size>
   </property>
   <property name="windowTitle">
@@ -40,8 +40,8 @@
     <rect>
      <x>10</x>
      <y>79</y>
-     <width>780</width>
-     <height>511</height>
+     <width>1000</width>
+     <height>668</height>
     </rect>
    </property>
    <property name="sizePolicy">
@@ -49,6 +49,18 @@
      <horstretch>0</horstretch>
      <verstretch>0</verstretch>
     </sizepolicy>
+   </property>
+   <property name="minimumSize">
+    <size>
+     <width>1000</width>
+     <height>668</height>
+    </size>
+   </property>
+   <property name="maximumSize">
+    <size>
+     <width>1000</width>
+     <height>16777215</height>
+    </size>
    </property>
    <property name="frameShape">
     <enum>QFrame::Panel</enum>
@@ -220,14 +232,27 @@
   <widget class="QPushButton" name="btn_print">
    <property name="geometry">
     <rect>
-     <x>450</x>
-     <y>40</y>
+     <x>930</x>
+     <y>50</y>
      <width>75</width>
      <height>23</height>
     </rect>
    </property>
    <property name="text">
     <string>印刷</string>
+   </property>
+  </widget>
+  <widget class="QPushButton" name="pushButton">
+   <property name="geometry">
+    <rect>
+     <x>930</x>
+     <y>20</y>
+     <width>75</width>
+     <height>23</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string>CSV読込</string>
    </property>
   </widget>
  </widget>
@@ -304,12 +329,28 @@
    <slot>list_print()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>470</x>
-     <y>50</y>
+     <x>950</x>
+     <y>60</y>
     </hint>
     <hint type="destinationlabel">
      <x>631</x>
      <y>28</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>pushButton</sender>
+   <signal>clicked()</signal>
+   <receiver>Form</receiver>
+   <slot>csvload_click()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>975</x>
+     <y>32</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>863</x>
+     <y>48</y>
     </hint>
    </hints>
   </connection>
@@ -320,5 +361,6 @@
   <slot>kumi_change()</slot>
   <slot>list_search()</slot>
   <slot>list_print()</slot>
+  <slot>csvload_click()</slot>
  </slots>
 </ui>

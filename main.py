@@ -16,8 +16,8 @@ from subprocess import check_call
 # from sub import Ui_Dialog
 # ----- debug ------
 cmb_data = [['', '東', '西'],
-            ['', '1', '2', '3', '4'],
-            ['', '1', '2', '3', '4', '5', '6', '7']]
+            [''],
+            ['']]
 
 
 class Form(QtWidgets.QWidget):
@@ -43,12 +43,12 @@ class Form(QtWidgets.QWidget):
         self.ui.tbl_main.setColumnWidth(3, 25)
         self.ui.tbl_main.setColumnWidth(4, 25)
         self.ui.tbl_main.setColumnWidth(5, 30)
-        self.ui.tbl_main.setColumnWidth(6, 100)
-        self.ui.tbl_main.setColumnWidth(7, 100)
-        self.ui.tbl_main.setColumnWidth(8, 90)
-        self.ui.tbl_main.setColumnWidth(9, 90)
-        self.ui.tbl_main.setColumnWidth(10, 70)
-        self.ui.tbl_main.setColumnWidth(11, 70)
+        self.ui.tbl_main.setColumnWidth(6, 150)
+        self.ui.tbl_main.setColumnWidth(7, 210)
+        self.ui.tbl_main.setColumnWidth(8, 100)
+        self.ui.tbl_main.setColumnWidth(9, 100)
+        self.ui.tbl_main.setColumnWidth(10, 95)
+        self.ui.tbl_main.setColumnWidth(11, 95)
 
         # ----- コンボボックス初期値セット -----
         self.ui.cmb_jitikai.addItems(cmb_data[0])
@@ -103,8 +103,9 @@ class Form(QtWidgets.QWidget):
                          })
 
         # PDF生成用オブジェクトの生成
-        pdf = MakePdf()
+        pdf = MakeHTML()
         pdf.make(data)
+        p.load()
 
     def jitikai_change(self):
         """自治会コンボボックスの変更時、対応する値を組コンボボックスにセットする"""
@@ -124,6 +125,9 @@ class Form(QtWidgets.QWidget):
         for row in c:
             self.ui.cmb_han.addItem(str(row[0]))
 
+    def csvload_click(self):
+        """CSVファイルから会員テーブルを作成"""
+        pass
 
 class Dialog(QtWidgets.QDialog):
     """詳細データ表示用サブウィンドウ"""
@@ -132,11 +136,12 @@ class Dialog(QtWidgets.QDialog):
         # ---- 初期処理 -----
         self.ui = Ui_Dialog()
         self.ui.setupUi(self)
+        self.svg = QtSvg.QSvgWidget()
 
     def map_show(self):
         """地図(SVG)を表示"""
-        svg.load('map.svg')
-        svg.show()
+        self.svg.load('map.svg')
+        self.svg.show()
 
     def input_data(self, row):
         """親ウィンドウから渡されたデータをセット"""
@@ -217,7 +222,7 @@ class DbConnect:
         self.cur.close()
 
 
-class PrinterView:
+class MakePDF:
     """HTMLからPDFを生成する(グローバルにて定義が必要)"""
     def __init__(self, in_file, out_file):
         in_path = os.path.abspath(os.path.dirname(sys.argv[0]))
@@ -247,7 +252,7 @@ class PrinterView:
         self.loadcnt += 1
 
 
-class MakePdf:
+class MakeHTML:
     """PDF作成ベースのHTMLをテンプレートより作成する"""
     def __init__(self):
         # テンプレートファイルを指定
@@ -259,8 +264,6 @@ class MakePdf:
         tmpfile = open('list.html', 'w', encoding='utf-8')
         tmpfile.write(html)
         tmpfile.close()
-
-        p.load()
 
 
 class SvgMap:
@@ -280,7 +283,6 @@ if __name__ == '__main__':
     # ----- debug ------
     app = QtWidgets.QApplication(sys.argv)
     window = Form()
-    p = PrinterView('list.html', 'list.pdf')
-    svg = QtSvg.QSvgWidget()
+    p = MakePDF('list.html', 'list.pdf')
     window.show()
     sys.exit(app.exec_())
