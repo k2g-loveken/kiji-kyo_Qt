@@ -2,6 +2,7 @@
   <dictionary name="hoge">
     <words>
       <w>colinfo</w>
+      <w>csvload</w>
       <w>delflg</w>
       <w>hoge</w>
       <w>jinja</w>

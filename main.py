@@ -3,6 +3,7 @@
 import sys
 import os
 import sqlite3
+import csv
 from ui_convert import UiConvert
 from PyQt5 import QtWidgets, QtSvg
 from jinja2 import Environment, FileSystemLoader
@@ -127,7 +128,11 @@ class Form(QtWidgets.QWidget):
 
     def csvload_click(self):
         """CSVファイルから会員テーブルを作成"""
-        pass
+        with open(csvfile, 'r', encoding='UTF-8') as f:
+            print("1")
+            reader = csv.reader(f, delimiter=',', quotechar='"')
+            self.con.insert_row(reader)
+
 
 class Dialog(QtWidgets.QDialog):
     """詳細データ表示用サブウィンドウ"""
@@ -156,12 +161,12 @@ class Dialog(QtWidgets.QDialog):
 class DbConnect:
     """データベース操作"""
     def __init__(self, str_db):
-        con = sqlite3.connect(str_db)
-        self.cur = con.cursor()
+        self.con = sqlite3.connect(str_db)
+        self.cur = self.con.cursor()
 
     def get_header(self):
         """DBより項目名を取得し、リストのヘッダーにセット"""
-        self.cur.execute("select * from '会員名簿'")
+        self.cur.execute("SELECT * FROM '会員名簿'")
         header = []
         for colinfo in self.cur.description:
             header.append(colinfo[0])
@@ -189,7 +194,7 @@ class DbConnect:
         if delflg is False:
             sql += "AND 退会年月日 == '' "
 
-        sql += "ORDER BY 自治会, 組, 班, 世帯 "
+        sql += "ORDER BY 自治会, 組, 班, 世帯, No "
 
         result = self.cur.execute(sql,
                                   {'jitikai': "%" if jitikai == "" else str(jitikai),
@@ -216,6 +221,23 @@ class DbConnect:
         )
         result = self.cur.execute(sql, {'kumi': "" if kumi == "" else str(kumi)})
         return result
+
+    def insert_row(self, data):
+        """データ登録"""
+        try:
+            # 登録前にTRUNCATE
+            self.cur.execute("DELETE FROM 会員名簿")
+            self.cur.execute("VACUUM")
+
+            sql = 'INSERT INTO 会員名簿 VALUES (?,?,?,?,?,?,?,?,?,?,?,? )'
+            for row in data:
+                self.cur.execute(sql, row)
+        except Exception as e:
+            if self.con:
+                print(e)
+                self.con.rollback()
+        finally:
+            self.con.commit()
 
     def db_close(self):
         """DBを閉じる"""
@@ -281,6 +303,7 @@ if __name__ == '__main__':
     from ui import Ui_Form
     from sub import Ui_Dialog
     # ----- debug ------
+    csvfile = 'member.csv'
     app = QtWidgets.QApplication(sys.argv)
     window = Form()
     p = MakePDF('list.html', 'list.pdf')
